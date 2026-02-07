@@ -1,30 +1,30 @@
-import 'package:elsanater/screens/login_screen.dart';
-import 'package:elsanater/screens/signup_screen.dart';
-import 'package:elsanater/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'app.dart';
+import 'core/network/api_client.dart';
+import 'providers/auth_provider.dart';
+import 'providers/student_provider.dart';
+import 'providers/attendance_provider.dart';
+import 'providers/exam_provider.dart';
+import 'providers/malzama_provider.dart';
+import 'providers/settings_provider.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final apiClient = await ApiClient.getInstance();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Login Example',
-      theme: ThemeData(
-        primaryColor: const Color(0xFF584BFF),
-        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-      },
-    );
-  }
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider(apiClient)),
+        ChangeNotifierProvider(create: (_) => StudentProvider(apiClient)),
+        ChangeNotifierProvider(create: (_) => AttendanceProvider(apiClient)),
+        ChangeNotifierProvider(create: (_) => ExamProvider(apiClient)),
+        ChangeNotifierProvider(create: (_) => MalzamaProvider(apiClient)),
+      ],
+      child: const ECMSApp(),
+    ),
+  );
 }
